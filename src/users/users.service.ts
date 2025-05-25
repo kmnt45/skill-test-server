@@ -105,4 +105,8 @@ export class UsersService {
   async findAll(): Promise<UserDocument[]> {
     return this.userModel.find().sort({ points: -1 }).exec();
   }
+
+  async findByResetToken(token: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ resetPasswordToken: token }).exec();
+  }
 }

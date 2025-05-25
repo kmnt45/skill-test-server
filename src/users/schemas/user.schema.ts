@@ -24,6 +24,12 @@ export class User {
   points: number;
 
   createdAt: Date;
+
+  @Prop()
+  resetPasswordToken?: string;
+
+  @Prop()
+  resetPasswordExpires?: Date;
 }
 
 export type UserDocument = User & Document;
