@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from './schemas/user.schema';
+import { User, UserDocument, ProgressRecord } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as fs from 'fs';
@@ -108,5 +108,30 @@ export class UsersService {
 
   async findByResetToken(token: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ resetPasswordToken: token }).exec();
+  }
+
+  async updateUserProgress(
+    userId: string,
+    newRecord: ProgressRecord,
+  ): Promise<UserDocument | null> {
+    const user = await this.userModel.findById(userId);
+    if (!user) return null;
+
+    const existingIndex = user.progressHistory.findIndex(
+      (r) => r.slug === newRecord.slug,
+    );
+
+    if (existingIndex >= 0) {
+      const existing = user.progressHistory[existingIndex];
+      if (existing.points !== newRecord.points) {
+        user.points += newRecord.points - existing.points;
+        user.progressHistory[existingIndex] = newRecord;
+      }
+    } else {
+      user.progressHistory.push(newRecord);
+      user.points += newRecord.points;
+    }
+
+    return user.save();
   }
 }

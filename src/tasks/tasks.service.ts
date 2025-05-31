@@ -1,12 +1,14 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { Judge0Service } from '../judge0/judge0.service';
 import { GitHubService } from '../github/github.service';
+import { Vm2Service } from '../vm2/vm2.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class TasksService {
   constructor(
-    private readonly judge0Service: Judge0Service,
+    private readonly vm2Service: Vm2Service,
     private readonly gitHubService: GitHubService,
+    private readonly usersService: UsersService,
   ) {}
 
   async getTasksList(
@@ -71,29 +73,29 @@ export class TasksService {
     categorySlug: string,
     taskSlug: string,
     userSolutionCode: string,
-    language: keyof typeof this.judge0Service.languageMap,
+    language: keyof typeof this.vm2Service.languageMap,
     testCases: { input: string; expectedOutput: string | number }[],
-    points?: number, // добавляем параметр для очков
+    points?: number,
   ): Promise<{ success: boolean; message: string; pointsEarned?: number }> {
     if (!testCases.length) {
       throw new BadRequestException('Нет тестов для задачи');
     }
 
     for (const testCase of testCases) {
-      const submissionResult = await this.judge0Service.createSubmission(
+      const result = await this.vm2Service.runCode(
         userSolutionCode,
         language,
         testCase.input,
       );
 
-      if (submissionResult.status.description !== 'Accepted') {
+      if (result.error) {
         return {
           success: false,
-          message: `Ошибка при выполнении: ${submissionResult.status.description}`,
+          message: `Ошибка при выполнении: ${result.error}`,
         };
       }
 
-      const output = submissionResult.stdout?.trim() ?? '';
+      const output = result.stdout?.trim() ?? '';
       const expectedOutput = String(testCase.expectedOutput).trim();
 
       if (output !== expectedOutput) {
@@ -104,10 +106,20 @@ export class TasksService {
       }
     }
 
+    const pointsEarned = points ?? 10;
+
+    const taskMeta = await this.getTask(categorySlug, taskSlug);
+
+    await this.usersService.updateUserProgress(userId, {
+      slug: taskSlug,
+      title: taskMeta.title ?? taskSlug,
+      points: pointsEarned,
+    });
+
     return {
       success: true,
       message: 'Все тесты пройдены',
-      pointsEarned: points ?? 10,
+      pointsEarned,
     };
   }
 }

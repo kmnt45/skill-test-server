@@ -53,8 +53,9 @@ export class TasksController {
       throw new BadRequestException('Задача не найдена');
     }
 
+    const supportedLanguages = ['javascript', 'typescript'] as const;
+
     const language = body.language.toLowerCase();
-    const supportedLanguages = ['javascript', 'python', 'cpp'] as const;
     if (!supportedLanguages.includes(language as any)) {
       throw new BadRequestException('Неподдерживаемый язык программирования');
     }
@@ -64,7 +65,7 @@ export class TasksController {
       categorySlug,
       taskSlug,
       body.solution,
-      language as keyof (typeof this.tasksService)['judge0Service']['languageMap'],
+      language as keyof (typeof this.tasksService)['vm2Service']['languageMap'],
       taskMeta.testCases ?? [],
       taskMeta.points,
     );

@@ -5,8 +5,9 @@
   "compilerOptions": {
     "assets": [
       {
-        "include": "app/templates/**/*",
-        "outDir": "app/templates"
+        "include": "src/app/templates/**/*",
+        "outDir": "app/templates",
+        "watchAssets": true
       }
     ]
   }

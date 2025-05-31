@@ -1,6 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
+export type ProgressRecord = {
+  slug: string;
+  title: string;
+  points: number;
+};
+
 @Schema({ timestamps: true })
 export class User {
   _id: Types.ObjectId;
@@ -22,6 +28,9 @@ export class User {
 
   @Prop({ default: 0 })
   points: number;
+
+  @Prop({ type: [Object], default: [] })
+  progressHistory: ProgressRecord[];
 
   createdAt: Date;
 

@@ -37,7 +37,7 @@ export class TestsService {
 
   async getTestsList(
     categorySlug: string,
-  ): Promise<{ slug: string; title: string }[]> {
+  ): Promise<{ slug: string; title: string; total?: number }[]> {
     const path = `${categorySlug}/tests/tests.json`;
     try {
       return await this.gitHubService.getJsonFileContent(path);
@@ -86,7 +86,6 @@ export class TestsService {
     return { correct: question.correctAnswerIndex === answerIndex };
   }
 
-  // Новый метод для подсчёта результатов теста и начисления поинтов пользователю
   async completeTest(
     userId: string,
     categorySlug: string,
@@ -119,9 +118,15 @@ export class TestsService {
       (correctAnswersCount / test.questions.length) * totalPoints,
     );
 
-    if (pointsEarned > 0) {
-      await this.usersService.addPointsToUser(userId, pointsEarned);
-    }
+    const testsList = await this.getTestsList(categorySlug);
+    const testInfo = testsList.find((t) => t.slug === testSlug);
+    const title = testInfo?.title || testSlug;
+
+    await this.usersService.updateUserProgress(userId, {
+      slug: testSlug,
+      title,
+      points: pointsEarned,
+    });
 
     return {
       totalQuestions: test.questions.length,

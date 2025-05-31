@@ -11,7 +11,7 @@ import { CategoriesModule } from '../categories/categories.module';
 import { QuestionsModule } from '../questions/questions.module';
 import { TestsModule } from '../tests/tests.module';
 import { TasksModule } from '../tasks/tasks.module';
-import { Judge0Module } from '../judge0/judge0.module';
+import { Vm2Module } from '../vm2/vm2.module';
 
 @Module({
   imports: [
@@ -55,7 +55,7 @@ import { Judge0Module } from '../judge0/judge0.module';
     QuestionsModule,
     TestsModule,
     TasksModule,
-    Judge0Module,
+    Vm2Module,
   ],
 })
 export class AppModule {}
