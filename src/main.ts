@@ -12,7 +12,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   app.enableCors({
-    origin: 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true,
     methods: 'GET,POST,PUT,DELETE,PATCH',
     allowedHeaders: 'Content-Type,Authorization',
@@ -24,7 +24,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  await app.listen(5000);
+  await app.listen(process.env.PORT || 5000, '0.0.0.0');
 }
 
 void bootstrap();
