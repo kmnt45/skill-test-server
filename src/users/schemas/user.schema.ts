@@ -1,8 +1,8 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Document, Types } from "mongoose";
 
 export type ProgressRecord = {
-  slug: string;
+  path: string;
   title: string;
   points: number;
 };
@@ -23,7 +23,7 @@ export class User {
   @Prop()
   avatar?: string;
 
-  @Prop({ default: '' })
+  @Prop({ default: "" })
   about?: string;
 
   @Prop({ default: 0 })
@@ -39,6 +39,15 @@ export class User {
 
   @Prop()
   resetPasswordExpires?: Date;
+
+  @Prop()
+  refreshToken?: string;
+
+  @Prop()
+  refreshTokenExpires?: Date;
+
+  @Prop()
+  lastPasswordResetRequest?: Date;
 }
 
 export type UserDocument = User & Document;

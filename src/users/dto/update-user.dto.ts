@@ -5,7 +5,7 @@ import {
   MaxLength,
   IsEmail,
   MinLength,
-} from 'class-validator';
+} from "class-validator";
 
 export class UpdateUserDto {
   @IsOptional()
@@ -21,11 +21,11 @@ export class UpdateUserDto {
   password?: string;
 
   @IsOptional()
-  @IsUrl({}, { message: 'avatarUrl должен быть валидным URL' })
+  @IsUrl({}, { message: "avatarUrl должен быть валидным URL" })
   avatarUrl?: string;
 
   @IsOptional()
-  @IsString({ message: 'about должно быть строкой' })
-  @MaxLength(300, { message: 'Максимум 300 символов' })
+  @IsString({ message: "about должно быть строкой" })
+  @MaxLength(300, { message: "Максимум 300 символов" })
   about?: string;
 }

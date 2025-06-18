@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import axios from 'axios';
-import { ConfigService } from '@nestjs/config';
+import { Injectable } from "@nestjs/common";
+import axios from "axios";
+import { ConfigService } from "@nestjs/config";
 
 type GitHubContentItem = {
   type: string;
@@ -14,19 +14,19 @@ export class GitHubService {
   private readonly githubToken: string;
 
   constructor(private readonly configService: ConfigService) {
-    const owner = this.configService.get<string>('GITHUB_REPO_OWNER', '');
-    const repo = this.configService.get<string>('GITHUB_REPO_NAME', '');
-    this.githubToken = this.configService.get<string>('GITHUB_TOKEN', '');
+    const owner = this.configService.get<string>("GITHUB_OWNER");
+    const repo = this.configService.get<string>("GITHUB_REPO");
+    this.githubToken = this.configService.get<string>("GITHUB_TOKEN");
     this.githubApiBaseUrl = `https://api.github.com/repos/${owner}/${repo}/contents`;
   }
 
   private getAuthHeaders() {
     return this.githubToken
       ? {
-          Authorization: `Bearer ${this.githubToken}`,
-          Accept: 'application/vnd.github.v3+json',
-        }
-      : { Accept: 'application/vnd.github.v3+json' };
+        Authorization: `Bearer ${this.githubToken}`,
+        Accept: "application/vnd.github.v3+json",
+      }
+      : { Accept: "application/vnd.github.v3+json" };
   }
 
   private async fetchContent(path: string): Promise<any> {
@@ -45,17 +45,17 @@ export class GitHubService {
 
   async getMarkdownFileContent(path: string): Promise<string> {
     const data = await this.fetchContent(path);
-    const buffer = Buffer.from(data.content, 'base64');
-    return buffer.toString('utf-8');
+    const buffer = Buffer.from(data.content, "base64");
+    return buffer.toString("utf-8");
   }
 
   async getJsonFileContent(path: string): Promise<any> {
-    const raw = await this.getMarkdownFileContent(path);
     try {
+      const raw = await this.getMarkdownFileContent(path);
       return JSON.parse(raw);
     } catch (error: any) {
       console.error(`Ошибка парсинга JSON файла ${path}:`, error.message);
-      throw new Error('Не удалось распарсить JSON файл');
+      throw new Error("Не удалось распарсить JSON файл");
     }
   }
 
@@ -69,6 +69,6 @@ export class GitHubService {
 
     const items = data as GitHubContentItem[];
 
-    return items.filter((item) => item.type === 'dir').map((item) => item.name);
+    return items.filter((item) => item.type === "dir").map((item) => item.name);
   }
 }

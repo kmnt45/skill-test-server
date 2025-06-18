@@ -2,9 +2,9 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-} from '@nestjs/common';
-import { GitHubService } from '../github/github.service';
-import { UsersService } from '../users/users.service';
+} from "@nestjs/common";
+import { GitHubService } from "@/github/github.service";
+import { UsersService } from "@/users/users.service";
 
 export type QuestionForClient = {
   question: string;
@@ -14,6 +14,7 @@ export type QuestionForClient = {
     current: number;
     total: number;
   };
+  title: string;
 };
 
 @Injectable()
@@ -31,18 +32,18 @@ export class TestsService {
     try {
       return await this.gitHubService.getJsonFileContent(path);
     } catch (e) {
-      throw new NotFoundException('Тест не найден');
+      throw new NotFoundException("Тест не найден");
     }
   }
 
   async getTestsList(
     categorySlug: string,
-  ): Promise<{ slug: string; title: string; total?: number }[]> {
+  ): Promise<{ path: string; title: string; points?: number }[]> {
     const path = `${categorySlug}/tests/tests.json`;
     try {
       return await this.gitHubService.getJsonFileContent(path);
     } catch (e) {
-      throw new NotFoundException('Не удалось получить список тестов');
+      throw new NotFoundException("Не удалось получить список тестов");
     }
   }
 
@@ -53,7 +54,7 @@ export class TestsService {
   ): Promise<QuestionForClient> {
     const test = await this.getFullTest(categorySlug, testSlug);
     if (!test.questions || !test.questions[index]) {
-      throw new NotFoundException('Вопрос не найден');
+      throw new NotFoundException("Вопрос не найден");
     }
 
     const { question, code, answers } = test.questions[index];
@@ -66,6 +67,7 @@ export class TestsService {
         current: index + 1,
         total: test.questions.length,
       },
+      title: test.title ?? testSlug,
     };
   }
 
@@ -77,10 +79,10 @@ export class TestsService {
   ): Promise<{ correct: boolean }> {
     const test = await this.getFullTest(categorySlug, testSlug);
     if (!test.questions || !test.questions[index]) {
-      throw new NotFoundException('Вопрос не найден');
+      throw new NotFoundException("Вопрос не найден");
     }
     if (answerIndex < 0) {
-      throw new BadRequestException('Неверный индекс ответа');
+      throw new BadRequestException("Неверный индекс ответа");
     }
     const question = test.questions[index];
     return { correct: question.correctAnswerIndex === answerIndex };
@@ -98,11 +100,11 @@ export class TestsService {
   }> {
     const test = await this.getFullTest(categorySlug, testSlug);
     if (!test.questions || !Array.isArray(test.questions)) {
-      throw new NotFoundException('Тест не найден или некорректен');
+      throw new NotFoundException("Тест не найден или некорректен");
     }
 
     if (!userAnswers || userAnswers.length !== test.questions.length) {
-      throw new BadRequestException('Неверное количество ответов');
+      throw new BadRequestException("Неверное количество ответов");
     }
 
     let correctAnswersCount = 0;
@@ -113,17 +115,17 @@ export class TestsService {
       }
     }
 
-    const totalPoints = test.points ?? 0;
+    const testsList = await this.getTestsList(categorySlug);
+    const testInfo = testsList.find((t) => t.path === testSlug);
+    const title = testInfo?.title || testSlug;
+    const totalPoints = testInfo?.points ?? test.points ?? 0;
+
     const pointsEarned = Math.floor(
       (correctAnswersCount / test.questions.length) * totalPoints,
     );
 
-    const testsList = await this.getTestsList(categorySlug);
-    const testInfo = testsList.find((t) => t.slug === testSlug);
-    const title = testInfo?.title || testSlug;
-
     await this.usersService.updateUserProgress(userId, {
-      slug: testSlug,
+      path: testSlug,
       title,
       points: pointsEarned,
     });

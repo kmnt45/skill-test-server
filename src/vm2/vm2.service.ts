@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { NodeVM } from 'vm2';
-import ts from 'typescript';
+import { Injectable } from "@nestjs/common";
+import { NodeVM } from "vm2";
+import ts from "typescript";
 
 @Injectable()
 export class Vm2Service {
   languageMap = {
-    javascript: 'javascript',
-    typescript: 'typescript',
+    javascript: "javascript",
+    typescript: "typescript",
   } as const;
 
   async runCode(
@@ -16,7 +16,7 @@ export class Vm2Service {
   ): Promise<{ stdout: string; error?: string }> {
     let jsCode = sourceCode;
 
-    if (language === 'typescript') {
+    if (language === "typescript") {
       const transpiled = ts.transpileModule(sourceCode, {
         compilerOptions: {
           module: ts.ModuleKind.CommonJS,
@@ -32,27 +32,27 @@ export class Vm2Service {
     `;
 
     const vm = new NodeVM({
-      console: 'off',
+      console: "off",
       timeout: 3000,
       eval: false,
       wasm: false,
     });
 
     try {
-      let output = '';
+      let output = "";
       const sandboxConsole = {
         log: (...args: any[]) => {
-          output += args.join(' ') + '\n';
+          output += args.join(" ") + "\n";
         },
       };
 
-      vm.freeze(sandboxConsole, 'console');
+      vm.freeze(sandboxConsole, "console");
 
-      vm.run(fullCode, 'userCode.vm.js');
+      vm.run(fullCode, "userCode.vm.js");
 
       return { stdout: output.trim() };
     } catch (error: any) {
-      return { stdout: '', error: error.message || String(error) };
+      return { stdout: "", error: error.message || String(error) };
     }
   }
 }

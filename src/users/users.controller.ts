@@ -10,13 +10,13 @@ import {
   UploadedFile,
   UseInterceptors,
   BadRequestException,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import * as multer from 'multer';
-import { UsersService } from './users.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Types } from 'mongoose';
-import { Request as ExpressRequest } from 'express';
+} from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
+import * as multer from "multer";
+import { UsersService } from "./users.service";
+import { JwtAuthGuard } from "@/auth/guards/jwt-auth.guard";
+import { Types } from "mongoose";
+import { Request as ExpressRequest } from "express";
 
 interface JwtUser {
   _id: string;
@@ -26,21 +26,21 @@ interface RequestWithUser extends ExpressRequest {
   user: JwtUser;
 }
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   private buildAvatarUrl(req: ExpressRequest, avatarPath?: string) {
     return avatarPath
-      ? `${req.protocol}://${req.get('host')}${avatarPath}`
+      ? `${req.protocol}://${req.get("host")}${avatarPath}`
       : null;
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('me')
+  @Get("me")
   async getMe(@Request() req: RequestWithUser) {
     const user = await this.usersService.findById(req.user._id.toString());
-    if (!user) throw new NotFoundException('Пользователь не найден');
+    if (!user) throw new NotFoundException("Пользователь не найден");
 
     return {
       id: user._id.toString(),
@@ -55,14 +55,14 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('me')
+  @Patch("me")
   async updateMe(@Request() req: RequestWithUser, @Body() data: any) {
     const updatedUser = await this.usersService.updateUser(
       req.user._id.toString(),
       data,
     );
     if (!updatedUser) {
-      throw new NotFoundException('Пользователь не найден');
+      throw new NotFoundException("Пользователь не найден");
     }
     return {
       id: updatedUser._id.toString(),
@@ -77,22 +77,22 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('me/avatar')
+  @Patch("me/avatar")
   @UseInterceptors(
-    FileInterceptor('avatar', { storage: multer.memoryStorage() }),
+    FileInterceptor("avatar", { storage: multer.memoryStorage() }),
   )
   async updateAvatar(
     @Request() req: RequestWithUser,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) {
-      throw new BadRequestException('Файл аватара не предоставлен');
+      throw new BadRequestException("Файл аватара не предоставлен");
     }
     const userId = req.user._id;
     const updatedUser = await this.usersService.updateUserAvatar(userId, file);
 
     if (!updatedUser) {
-      throw new NotFoundException('Пользователь не найден');
+      throw new NotFoundException("Пользователь не найден");
     }
 
     return {
@@ -107,8 +107,8 @@ export class UsersController {
     };
   }
 
-  @Get(':id')
-  async getUserById(@Param('id') id: string, @Request() req: ExpressRequest) {
+  @Get(":id")
+  async getUserById(@Param("id") id: string, @Request() req: ExpressRequest) {
     if (!Types.ObjectId.isValid(id)) {
       return null;
     }

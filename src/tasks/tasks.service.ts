@@ -1,7 +1,7 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { GitHubService } from '../github/github.service';
-import { Vm2Service } from '../vm2/vm2.service';
-import { UsersService } from '../users/users.service';
+import { Injectable, BadRequestException } from "@nestjs/common";
+import { GitHubService } from "@/github/github.service";
+import { Vm2Service } from "@/vm2/vm2.service";
+import { UsersService } from "@/users/users.service";
 
 @Injectable()
 export class TasksService {
@@ -13,21 +13,26 @@ export class TasksService {
 
   async getTasksList(
     categorySlug: string,
-  ): Promise<{ slug: string; title: string }[]> {
+  ): Promise<{ path: string; title: string; points: number }[]> {
     const taskSlugs = await this.gitHubService.getDirectoryList(
       `${categorySlug}/tasks`,
     );
 
-    const tasks: { slug: string; title: string }[] = [];
+    const tasks: { path: string; title: string; points: number }[] = [];
 
-    for (const slug of taskSlugs) {
+    for (const path of taskSlugs) {
       try {
         const meta = await this.gitHubService.getJsonFileContent(
-          `${categorySlug}/tasks/${slug}/meta.json`,
+          `${categorySlug}/tasks/${path}/meta.json`,
         );
-        tasks.push({ slug, title: meta.title ?? slug });
+
+        tasks.push({
+          path,
+          points: meta.points ?? 0,
+          title: meta.title ?? path,
+        });
       } catch {
-        tasks.push({ slug, title: slug });
+        tasks.push({ path, title: path, points: 0 });
       }
     }
 
@@ -49,13 +54,13 @@ export class TasksService {
       `${categorySlug}/tasks/${taskSlug}/meta.json`,
     );
 
-    let statement = '';
+    let statement = "";
     try {
       statement = await this.gitHubService.getMarkdownFileContent(
         `${categorySlug}/tasks/${taskSlug}/index.md`,
       );
     } catch {
-      statement = '';
+      statement = "";
     }
 
     return {
@@ -78,7 +83,7 @@ export class TasksService {
     points?: number,
   ): Promise<{ success: boolean; message: string; pointsEarned?: number }> {
     if (!testCases.length) {
-      throw new BadRequestException('Нет тестов для задачи');
+      throw new BadRequestException("Нет тестов для задачи");
     }
 
     for (const testCase of testCases) {
@@ -95,7 +100,7 @@ export class TasksService {
         };
       }
 
-      const output = result.stdout?.trim() ?? '';
+      const output = result.stdout?.trim() ?? "";
       const expectedOutput = String(testCase.expectedOutput).trim();
 
       if (output !== expectedOutput) {
@@ -111,14 +116,14 @@ export class TasksService {
     const taskMeta = await this.getTask(categorySlug, taskSlug);
 
     await this.usersService.updateUserProgress(userId, {
-      slug: taskSlug,
+      path: taskSlug,
       title: taskMeta.title ?? taskSlug,
       points: pointsEarned,
     });
 
     return {
       success: true,
-      message: 'Все тесты пройдены',
+      message: "Все тесты пройдены",
       pointsEarned,
     };
   }

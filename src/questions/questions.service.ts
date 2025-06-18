@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { GitHubService } from '../github/github.service';
+import { Injectable } from "@nestjs/common";
+import { GitHubService } from "@/github/github.service";
 
 export type Question = {
   slug: string;

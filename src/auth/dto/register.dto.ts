@@ -5,7 +5,7 @@ import {
   MaxLength,
   MinLength,
   Matches,
-} from 'class-validator';
+} from "class-validator";
 
 export class RegisterDto {
   @IsNotEmpty()
@@ -19,7 +19,7 @@ export class RegisterDto {
   @IsString()
   @MinLength(5)
   @Matches(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{5,}$/, {
-    message: 'Пароль должен содержать заглавные и строчные буквы и цифры',
+    message: "Пароль должен содержать заглавные и строчные буквы и цифры",
   })
   password: string;
 }

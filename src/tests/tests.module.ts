@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common';
-import { TestsController } from './tests.controller';
-import { TestsService } from './tests.service';
-import { GitHubModule } from '../github/github.module';
-import { UsersModule } from '../users/users.module';
+import { Module } from "@nestjs/common";
+import { TestsController } from "./tests.controller";
+import { TestsService } from "./tests.service";
+import { GitHubModule } from "@/github/github.module";
+import { UsersModule } from "@/users/users.module";
 
 @Module({
   controllers: [TestsController],
