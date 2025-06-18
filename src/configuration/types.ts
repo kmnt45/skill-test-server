@@ -15,6 +15,9 @@ export interface IConfig {
   mailerHost: string;
   mailerPort: string;
   mailerSignature: string;
+  owner: string;
+  repo: string;
+  token: string;
 }
 
 interface IConfigurationReturns {

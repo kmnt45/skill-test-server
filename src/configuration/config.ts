@@ -18,5 +18,8 @@ export const configuration: Configuration = () => ({
     mailerPort: process.env.MAILER_PORT ?? "465",
     mailerHost: process.env.MAILER_HOST,
     mailerSignature: process.env.MAILER_SIGNATURE ?? "1",
+    owner: process.env.GITHUB_REPO_OWNER,
+    repo: process.env.GITHUB_REPO_NAME,
+    token: process.env.GITHUB_TOKEN,
   },
 });

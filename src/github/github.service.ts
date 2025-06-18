@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import axios from "axios";
 import { ConfigService } from "@nestjs/config";
+import { IConfig } from "@/configuration";
 
 type GitHubContentItem = {
   type: string;
@@ -14,9 +15,11 @@ export class GitHubService {
   private readonly githubToken: string;
 
   constructor(private readonly configService: ConfigService) {
-    const owner = this.configService.get<string>("GITHUB_OWNER");
-    const repo = this.configService.get<string>("GITHUB_REPO");
-    this.githubToken = this.configService.get<string>("GITHUB_TOKEN");
+    const appConfig = this.configService.get<IConfig>("app");
+
+    const owner = appConfig.owner;
+    const repo = appConfig.repo;
+    this.githubToken = appConfig.token;
     this.githubApiBaseUrl = `https://api.github.com/repos/${owner}/${repo}/contents`;
   }
 
