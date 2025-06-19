@@ -139,7 +139,7 @@ export class UsersService {
     const expiresAt = new Date();
     expiresAt.setSeconds(
       expiresAt.getSeconds() +
-        parseInt(process.env.JWT_REFRESH_EXPIRES_IN || "604800"), // 7 дней по умолчанию
+        parseInt(process.env.JWT_REFRESH_EXPIRES_IN || "604800"),
     );
 
     await this.userModel
