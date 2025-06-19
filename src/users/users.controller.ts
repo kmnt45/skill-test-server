@@ -32,7 +32,9 @@ export class UsersController {
 
   private buildAvatarUrl(req: ExpressRequest, avatarPath?: string) {
     if (!avatarPath) return null;
-    return `${req.protocol === 'http' ? 'https' : req.protocol}://${req.get("host")}${avatarPath}`;
+    const protocol = req.protocol;
+    const host = req.get("host");
+    return `${protocol}://${host}${avatarPath}`;
   }
 
   @UseGuards(JwtAuthGuard)
