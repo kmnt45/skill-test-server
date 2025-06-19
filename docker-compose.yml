@@ -7,8 +7,8 @@ services:
       - "5000:5000"
     env_file: .env.production
     volumes:
-      - /etc/bitbox/storages:/app/storages
-      - /etc/bitbox/temp:/app/temp
+      - /etc/skill-test/storages:/app/storages
+      - /etc/skill-test/temp:/app/temp
       - /etc/letsencrypt/live/skill-test.ru/privkey.pem:/etc/certs/privkey.pem
       - /etc/letsencrypt/live/skill-test.ru/cert.pem:/etc/certs/cert.pem
 
