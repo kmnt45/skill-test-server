@@ -21,7 +21,7 @@ async function bootstrap() {
     allowedHeaders: "Content-Type,Authorization",
   });
 
-  app.useStaticAssets(join(__dirname, "..", "uploads"), {
+  app.useStaticAssets(join(__dirname, "..", "..", "uploads"), {
     prefix: "/uploads/",
   });
 
