@@ -1,15 +1,15 @@
-# Dockerfile для NestJS-сервера
-FROM node:20
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+COPY package.json yarn.lock ./
+
+RUN yarn install --frozen-lockfile
 
 COPY . .
 
-RUN npm run build
+RUN yarn build
 
 EXPOSE 5000
 
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "./dist/main.js"]
