@@ -85,7 +85,11 @@ export class UsersService {
       }
     }
 
-    const fileName = `${userId}-${Date.now()}-${file.originalname}`;
+    const safeFileName = file.originalname
+      .replace(/[^a-zA-Z0-9.\-_]/g, "_");
+
+    const fileName = `${userId}-${Date.now()}-${safeFileName}`;
+
     const filePath = path.join(uploadDir, fileName);
     fs.writeFileSync(filePath, file.buffer);
 
