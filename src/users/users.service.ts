@@ -68,7 +68,7 @@ export class UsersService {
     userId: string,
     file: Express.Multer.File,
   ): Promise<UserDocument | null> {
-    const uploadDir = path.resolve(__dirname, "../../uploads");
+    const uploadDir = path.resolve(__dirname, "../../../uploads");
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
